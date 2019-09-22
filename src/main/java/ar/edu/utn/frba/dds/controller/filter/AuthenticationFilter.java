@@ -16,18 +16,31 @@ public class AuthenticationFilter {
 
     public static Filter authenticate = (request, response) -> {
 
-        final String xUser = request.headers("X-User");
+        final Optional<Usuario> maybeUser = Optional.ofNullable((Usuario) request.session().attribute("user"));
+        final Optional<String> maybeXUser = Optional.ofNullable(request.headers("X-User"));
 
-        if (Strings.isNullOrEmpty(xUser)) {
-            halt(HttpStatus.UNAUTHORIZED_401);
-        }
+        if (maybeUser.isPresent()) {
 
-        final Optional<Usuario> maybeUsuario = usuarioService.fetchUsuario(xUser);
+            // ya tenia un usuario en la session y si pasan X-User tiene que ser el mismo ya asignado
 
-        if (maybeUsuario.isPresent()) {
-            request.session().attribute("user", maybeUsuario.get());
+            maybeXUser.filter(xUser -> !xUser.equalsIgnoreCase(maybeUser.get().getNombre()))
+                    .ifPresent(xUser -> halt(HttpStatus.UNAUTHORIZED_401));
+
         } else {
-            halt(HttpStatus.UNAUTHORIZED_401);
+
+            // no tenia usuario en la session y tienen que pasarlo en X-User para asignarlo
+
+            if (!maybeXUser.isPresent() || maybeXUser.filter(Strings::isNullOrEmpty).isPresent()) {
+                halt(HttpStatus.UNAUTHORIZED_401);
+            }
+
+            final Optional<Usuario> maybeUsuario = usuarioService.fetchUsuario(maybeXUser.get());
+
+            if (maybeUsuario.isPresent()) {
+                request.session().attribute("user", maybeUsuario.get());
+            } else {
+                halt(HttpStatus.UNAUTHORIZED_401);
+            }
         }
     };
 }
