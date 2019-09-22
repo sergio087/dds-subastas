@@ -5,6 +5,8 @@ import spark.ResponseTransformer;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 
 import static ar.edu.utn.frba.dds.controller.filter.AuthenticationFilter.authenticate;
+import static ar.edu.utn.frba.dds.controller.filter.ContentTypeFilter.contentAppJson;
+import static spark.Spark.after;
 import static spark.Spark.before;
 import static spark.Spark.get;
 import static spark.Spark.path;
@@ -22,7 +24,8 @@ public class RoutesConfig {
 
         path("/api", () -> {
 
-            before("/*",authenticate);
+            before("/*", authenticate);
+            after("/*", contentAppJson);
 
             path("/subastas", () -> {
 
