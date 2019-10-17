@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import spark.ResponseTransformer;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 
-import static ar.edu.utn.frba.dds.controller.filter.AuthenticationFilter.authenticate;
-import static ar.edu.utn.frba.dds.controller.filter.ContentTypeFilter.contentAppJson;
+import static ar.edu.utn.frba.dds.controller.SubastaController.getSubastas;
+import static ar.edu.utn.frba.dds.controller.util.AuthenticationFilter.authenticate;
+import static ar.edu.utn.frba.dds.controller.util.ContentTypeFilter.contentAppJson;
+import static ar.edu.utn.frba.dds.controller.util.RouteWithSessionWrapper.wrap;
 import static spark.Spark.after;
 import static spark.Spark.before;
 import static spark.Spark.get;
@@ -14,11 +16,10 @@ import static spark.Spark.staticFiles;
 
 public class RoutesConfig {
 
+    private static final HandlebarsTemplateEngine templateEngine = new HandlebarsTemplateEngine();
+    private static final ResponseTransformer transformToJson = new Gson()::toJson;
+
     public static void routes() {
-
-        final HandlebarsTemplateEngine templateEngine = new HandlebarsTemplateEngine();
-        final ResponseTransformer transformToJson = new Gson()::toJson;
-
 
         staticFiles.location("/public");
 
@@ -31,7 +32,7 @@ public class RoutesConfig {
 
                 // TODO completar API para el recurso subasta
 
-                get("", SubastaController.getSubastas, transformToJson);
+                get("", wrap(true, getSubastas), transformToJson);
             });
 
 

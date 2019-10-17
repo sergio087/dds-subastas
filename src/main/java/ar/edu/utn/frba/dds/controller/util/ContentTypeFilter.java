@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.controller.filter;
+package ar.edu.utn.frba.dds.controller.util;
 
 import spark.Filter;
 

@@ -3,34 +3,44 @@ package ar.edu.utn.frba.dds.domain;
 import ar.edu.utn.frba.dds.domain.exception.EstadoSubastaInvalidoException;
 import ar.edu.utn.frba.dds.domain.exception.OfertaInvalidaException;
 import ar.edu.utn.frba.dds.domain.exception.SubastaInvalida;
+import ar.edu.utn.frba.dds.repository.EntityObject;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Entity;
+import javax.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Entity
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true, exclude = {"ofertas", "etiquetas", "ganador", "oferente"})
 @AllArgsConstructor
-public class Subasta {
+@NoArgsConstructor
+public class Subasta extends EntityObject<Integer> {
 
     private String producto;
+    @Transient
     private List<String> etiquetas;
     private LocalDateTime inicio;
     private LocalDateTime fin;
     private EstadoSubasta estado;
+    @Transient
     private List<Oferta> ofertas;
     private Double montoMinimo;
+    @Transient
     private Oferta ganador;
+    @Transient
     private Usuario oferente;
 
     /**
